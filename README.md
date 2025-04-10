@@ -124,3 +124,29 @@
 </script>
 </body>
 </html>
+let targetX = characterPos.x;
+
+// 터치 좌표를 저장만 함
+canvas.addEventListener('touchmove', function(e) {
+  e.preventDefault();
+  const touch = e.touches[0];
+  const rect = canvas.getBoundingClientRect();
+  targetX = touch.clientX - rect.left - characterPos.width / 2;
+}, { passive: false });
+
+// draw 루프 내에서 계속 따라가기
+function draw() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
+
+  // 👇 이 부분이 부드러운 이동 처리
+  characterPos.x = targetX;
+  characterPos.x = Math.max(0, Math.min(characterPos.x, canvas.width - characterPos.width));
+
+  ctx.drawImage(character, characterPos.x, characterPos.y, characterPos.width, characterPos.height);
+  
+  // (빵 처리 및 점수 코드 생략)
+  
+  requestAnimationFrame(draw);
+}
+
