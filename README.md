@@ -68,6 +68,9 @@
 
   let targetX = characterPos.x;
 
+  let bgY = 0;
+  const bgSpeed = 1;
+
   function createBread() {
     const i = Math.floor(Math.random() * loadedBreadImgs.length);
     breads.push({
@@ -81,14 +84,18 @@
   }
 
   function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
+    // 타일 배경 반복 스크롤
+    bgY += bgSpeed;
+    if (bgY >= canvas.height) bgY = 0;
+    ctx.drawImage(bg, 0, bgY - canvas.height, canvas.width, canvas.height);
+    ctx.drawImage(bg, 0, bgY, canvas.width, canvas.height);
 
-    // 캐릭터 이동 처리
+    // 캐릭터 위치 갱신
     characterPos.x = targetX;
     characterPos.x = Math.max(0, Math.min(characterPos.x, canvas.width - characterPos.width));
     ctx.drawImage(character, characterPos.x, characterPos.y, characterPos.width, characterPos.height);
 
+    // 빵 처리
     breads.forEach((b, i) => {
       b.y += b.speed;
       ctx.drawImage(b.img, b.x, b.y, b.width, b.height);
@@ -110,13 +117,13 @@
     requestAnimationFrame(draw);
   }
 
-  // PC 이동
+  // PC 방향키 이동
   document.addEventListener('keydown', e => {
     if (e.key === 'ArrowLeft') targetX -= characterPos.speed;
     if (e.key === 'ArrowRight') targetX += characterPos.speed;
   });
 
-  // 모바일 터치 즉시 이동
+  // 터치 이동
   canvas.addEventListener('touchmove', function(e) {
     e.preventDefault();
     const touch = e.touches[0];
