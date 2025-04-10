@@ -66,6 +66,8 @@
     speed: 20
   };
 
+  let targetX = characterPos.x;
+
   function createBread() {
     const i = Math.floor(Math.random() * loadedBreadImgs.length);
     breads.push({
@@ -81,6 +83,10 @@
   function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
+
+    // 캐릭터 이동 처리
+    characterPos.x = targetX;
+    characterPos.x = Math.max(0, Math.min(characterPos.x, canvas.width - characterPos.width));
     ctx.drawImage(character, characterPos.x, characterPos.y, characterPos.width, characterPos.height);
 
     breads.forEach((b, i) => {
@@ -106,8 +112,8 @@
 
   // PC 이동
   document.addEventListener('keydown', e => {
-    if (e.key === 'ArrowLeft') characterPos.x -= characterPos.speed;
-    if (e.key === 'ArrowRight') characterPos.x += characterPos.speed;
+    if (e.key === 'ArrowLeft') targetX -= characterPos.speed;
+    if (e.key === 'ArrowRight') targetX += characterPos.speed;
   });
 
   // 모바일 터치 즉시 이동
@@ -115,8 +121,7 @@
     e.preventDefault();
     const touch = e.touches[0];
     const rect = canvas.getBoundingClientRect();
-    characterPos.x = touch.clientX - rect.left - characterPos.width / 2;
-    characterPos.x = Math.max(0, Math.min(characterPos.x, canvas.width - characterPos.width));
+    targetX = touch.clientX - rect.left - characterPos.width / 2;
   }, { passive: false });
 
   setInterval(createBread, 1000);
@@ -124,29 +129,3 @@
 </script>
 </body>
 </html>
-let targetX = characterPos.x;
-
-// 터치 좌표를 저장만 함
-canvas.addEventListener('touchmove', function(e) {
-  e.preventDefault();
-  const touch = e.touches[0];
-  const rect = canvas.getBoundingClientRect();
-  targetX = touch.clientX - rect.left - characterPos.width / 2;
-}, { passive: false });
-
-// draw 루프 내에서 계속 따라가기
-function draw() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
-
-  // 👇 이 부분이 부드러운 이동 처리
-  characterPos.x = targetX;
-  characterPos.x = Math.max(0, Math.min(characterPos.x, canvas.width - characterPos.width));
-
-  ctx.drawImage(character, characterPos.x, characterPos.y, characterPos.width, characterPos.height);
-  
-  // (빵 처리 및 점수 코드 생략)
-  
-  requestAnimationFrame(draw);
-}
-
